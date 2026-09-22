@@ -7,4 +7,4 @@ Average rainfall  - numerical [mm/day]
 Humidity - numerical [%]
 Cloud coverage - categorical ["Clear", "Cumulus", "Cirus", "Cumulonimbus", "Stratus"]
 
-Temperature | Wind spped | Air pressure | Average rainfall  | Humidity | Cloud coverage
+Temperature | Wind speed | Air pressure | Average rainfall  | Humidity | Cloud coverage

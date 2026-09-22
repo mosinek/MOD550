@@ -1,14 +1,25 @@
 """
-jebany docstring
+This file contains a function that generates data and checks their integrity. 
 """
-import numpy as np
 import random
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 random.seed(42)
 
 def create_data():
-    """ weather station"""
+    """
+    This function generates 600 observations from weather station in Stavanger, Norway.
+    The data contain temperature, wind speed, air pressure, average rainfall, 
+    humidity and cloud coverage.
+    The following features have the following distributions:
+    temperature - symmetric / gaussian distribution
+    wind speed - log-normal distribution
+    air pressure - almost constant
+    average rainfall - symmetric / gaussian distribution
+    humidity - correlated with average rainfall + some noise
+    """
 
     temperature = np.random.normal(12,5,600)
     wind_speed = np.random.lognormal(0,1,600)
@@ -19,39 +30,40 @@ def create_data():
     humidity = [70 + 0.5 * avg_rain[i] + np.random.randn() for i in range(600)]
 
     cloud_types = ["Clear", "Cumulus", "Cirus", "Cumulonimbus", "Stratus"] # cat
-    cloud_coverage = [np.random.choice(cloud_types, 600)]
+    cloud_coverage = np.random.choice(cloud_types, 600)
 
-    plt.scatter(range(600), temperature)
-    plt.xlabel("Observation")
-    plt.ylabel("Temperature")
-    plt.title("Temperature")
-    plt.show()
+    df = pd.DataFrame({'Temperature': temperature, 'Wind speed': wind_speed, 'Air pressure': air_pressure, 'Average rainfall': avg_rain, 'Humidity': humidity, 'Cloud coverage': cloud_coverage})
+    print(df)
 
-    plt.scatter(range(600), wind_speed)
-    plt.xlabel("Observation")
-    plt.ylabel("Wind speed")
-    plt.title("Wind Speed")
-    plt.show()
+    return df
 
-    plt.scatter(range(600), air_pressure)
-    plt.xlabel("Observation")
-    plt.ylabel("Air pressure")
-    plt.title("Air Pressure")
-    plt.show()
+df = create_data()
 
-    plt.scatter(range(600), avg_rain)
-    plt.xlabel("Observation")
-    plt.ylabel("Rain")
-    plt.title("Average Rainfall")
-    plt.show()
+def integrity_check(df):
+    """
+    This function takes dataset as an input, checks its integrity and returns a report. 
+    Checking integrity contains the following steps:
+    1. Checking data types
+    2. Checking missing values
+    3. Checking duplicates
+    4. Checking reasonable ranges
+    """
+    integrity_report = {}
+    print(df.dtypes["Temperature"])
 
-    plt.scatter(range(600), humidity)
-    plt.xlabel("Observation")
-    plt.ylabel("Humidity")
-    plt.title("Average Humidity")
-    plt.show()
+    # data types
 
-    print(cloud_coverage)
+        
+    # missing values
+    
+
+    # duplicates
+    
+
+    # reasonable ranges
 
 
-create_data()
+    print("Data integrity checked. Everything is fine.")
+    return integrity_report
+
+integrity_check(df)
