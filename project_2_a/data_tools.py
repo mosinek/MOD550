@@ -51,14 +51,50 @@ def integrity_check(df):
     integrity_report = {}
     print(df.dtypes["Temperature"])
 
-    # data types
+    df_copy = df.copy()
 
+    # data types
+    categorical_cols = df_copy.select_dtypes(include=['object', 'category']).columns
+    numerical_cols = df_copy.select_dtypes(include=['int64', 'float64']).columns
+    if (len(categorical_cols) + len(numerical_cols)) == len(df_copy.columns):
+        print("All columns are categorical or numerical!")
+    else:
+        print("There are some unforeseen other data types in the data!")
+        # and now we either delete those rows? or try to input them??
+        # most probably delete - since in the future tasks, he wants us to use this function on arbitrary data
         
     # missing values
-    
+    if df_copy.isnull().sum().sum() > 0:
+        if categorical_cols.isnull().sum() > 0:
+            print("Nulls in categorical column!")
+        # ... do sth to em
+        # we can either try to: 
+        # 1. input them randomly, 
+        # 2. input them based on other data i.e. small model like knn (might be complicated for enirico),
+        # 3. or delete them?? if there is a small amount of them like less than 15%??
+        for col in categorical_cols:
+            if col.isnull().sum() > col.len()*0.15: # if that makes sense
+                col.drop() #?
+        if numerical_cols.isnull().sum() > 0:
+            for i in numerical_cols:
+            # dooo sth
+            # mean imputing??? or sth else
+                i = []
+            
+    else:
+        print("Dataframe has no missing values!")
+        pass
 
-    # duplicates
-    
+
+
+    # duplicates 
+
+    if df_copy.duplicated().sum() == 0:
+        print("No duplicate rows detected.")
+    else:
+        df_copy.drop_duplicates() # dropping duplicate rows
+  
+
 
     # reasonable ranges
 
