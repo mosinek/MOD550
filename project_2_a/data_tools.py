@@ -39,6 +39,71 @@ def create_data():
 
 df = create_data()
 
+def check_data_types(df):
+    """
+    This function check data types of the columns and return True if they are correct and False otherwise. 
+    """
+
+    # shouldn't we define expected_types since we know the truth about our data? 
+    categorical_cols = df.select_dtypes(include=['object', 'category']).columns
+    numerical_cols = df.select_dtypes(include=['int64', 'float64']).columns
+    if (len(categorical_cols) + len(numerical_cols)) == len(df.columns):
+        print("All columns are categorical or numerical!")
+        return True
+    else:
+        print("There are some unforeseen other data types in the data!")
+        return False
+
+def check_missing_values(df):
+    """
+    This functions checks if there are any missing values in the dataset, returns False if there are any and True otherwise.
+    """
+    if df.isnull().sum().sum() > 0:
+        print("Dataset contains missing values!")
+        for col in df.columns:
+            missing_values = df[col].isnull().sum()
+            if missing_values > 0:
+                print(f"Column {col} contains {missing_values} missing values!")
+        return False
+
+    else:
+        print("Dataset has no missing values!")
+        return True
+
+def check_duplicates(df):
+    """
+    This function checks if there are any duplicate rows in the dataset. It returns True if there are no duplicates and False otherwise.
+    """
+    if df.duplicated().sum() == 0:
+        print("No duplicate rows detected.")
+        return True
+     
+    else:
+        print(f"{df.duplicated().sum()} duplicate rows detected.")
+        return False
+
+def check_ranges(df):
+    """
+    This function check if the ranges of the data are reasonable. For example:
+    -humidity should be between 0 and 100,
+    -wind speed and average rainfall cannot be negative
+    The function returns True if all ranges are OK and False otherwise.
+    """
+    if ((df["Humidity"] < 0) | (df["Humidity"] > 100)).any():
+        print("Humidity column contains values outside the expected range!")
+        return False
+
+    if (df["Wind speed"] < 0).any():
+        print("Wind speed column contains negative values!")
+        return False
+
+    if (df["Average rainfall"] < 0).any():
+        print("Average rainfall column contains negative values!")
+        return False
+
+    print("All ranges are reasonable.")
+    return True
+
 def integrity_check(df):
     """
     This function takes dataset as an input, checks its integrity and returns a report. 
@@ -48,58 +113,18 @@ def integrity_check(df):
     3. Checking duplicates
     4. Checking reasonable ranges
     """
-    integrity_report = {}
-    print(df.dtypes["Temperature"])
+    integrity_report = {
+        "data_types": check_data_types(df),
+        "missing_values": check_missing_values(df),
+        "duplicates": check_duplicates(df),
+        "ranges": check_ranges(df)
+    }
 
-    df_copy = df.copy()
-
-    # data types
-    categorical_cols = df_copy.select_dtypes(include=['object', 'category']).columns
-    numerical_cols = df_copy.select_dtypes(include=['int64', 'float64']).columns
-    if (len(categorical_cols) + len(numerical_cols)) == len(df_copy.columns):
-        print("All columns are categorical or numerical!")
+    if all(integrity_report.values()):
+        print("Integrity test: OK.")
     else:
-        print("There are some unforeseen other data types in the data!")
-        # and now we either delete those rows? or try to input them??
-        # most probably delete - since in the future tasks, he wants us to use this function on arbitrary data
-        
-    # missing values
-    if df_copy.isnull().sum().sum() > 0:
-        if categorical_cols.isnull().sum() > 0:
-            print("Nulls in categorical column!")
-        # ... do sth to em
-        # we can either try to: 
-        # 1. input them randomly, 
-        # 2. input them based on other data i.e. small model like knn (might be complicated for enirico),
-        # 3. or delete them?? if there is a small amount of them like less than 15%??
-        for col in categorical_cols:
-            if col.isnull().sum() > col.len()*0.15: # if that makes sense
-                col.drop() #?
-        if numerical_cols.isnull().sum() > 0:
-            for i in numerical_cols:
-            # dooo sth
-            # mean imputing??? or sth else
-                i = []
-            
-    else:
-        print("Dataframe has no missing values!")
-        pass
+        print("Integrity test: FAILED.")
 
-
-
-    # duplicates 
-
-    if df_copy.duplicated().sum() == 0:
-        print("No duplicate rows detected.")
-    else:
-        df_copy.drop_duplicates() # dropping duplicate rows
-  
-
-
-    # reasonable ranges
-
-
-    print("Data integrity checked. Everything is fine.")
     return integrity_report
 
 integrity_check(df)
