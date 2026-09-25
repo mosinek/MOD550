@@ -39,31 +39,45 @@ def create_data():
 
 df = create_data()
 
-def check_data_types(df):
+def check_data_types_n_columns(df,n_columns):
     """
     This function check data types of the columns and return True if they are correct and False otherwise. 
     """
-
     # shouldn't we define expected_types since we know the truth about our data? 
+    # answer: true! but in the fututre we will have to use this function on unforeseen data, so idk if we can expect it in the function
     categorical_cols = df.select_dtypes(include=['object', 'category']).columns
     numerical_cols = df.select_dtypes(include=['int64', 'float64']).columns
+    
+    if (len(df.columns) == n_columns):
+        shape = True
+        print("Number of columns in dataframe matches expectation.")
+    else:
+        shape = False
+        print("The number of columns detected does NOT match expectations!")
+        
     if (len(categorical_cols) + len(numerical_cols)) == len(df.columns):
         print("All columns are categorical or numerical!")
-        return True
-    else:
+        if shape is True:
+            return True
+        else:
+            return False
+    elif(len(df.select_dtypes(exclude=['object','category','int64','float64'])).columns) > 0:
+        # elif when we add all other data types the number of columns matches!
         print("There are some unforeseen other data types in the data!")
         return False
+    # how can we check if the number of columns is what we expect??? we'd need to add nr of columns as a variable,
+    # which is chunky, but i guess thats how we have to do it?
 
 def check_missing_values(df):
     """
     This functions checks if there are any missing values in the dataset, returns False if there are any and True otherwise.
     """
     if df.isnull().sum().sum() > 0:
-        print("Dataset contains missing values!")
+        print("Dataset contains missing values:")
         for col in df.columns:
             missing_values = df[col].isnull().sum()
             if missing_values > 0:
-                print(f"Column {col} contains {missing_values} missing values!")
+                print(f"Column: {col} contains {missing_values} missing values!")
         return False
 
     else:
@@ -104,7 +118,7 @@ def check_ranges(df):
     print("All ranges are reasonable.")
     return True
 
-def integrity_check(df):
+def integrity_check(df,n_col):
     """
     This function takes dataset as an input, checks its integrity and returns a report. 
     Checking integrity contains the following steps:
@@ -113,8 +127,9 @@ def integrity_check(df):
     3. Checking duplicates
     4. Checking reasonable ranges
     """
+    print(f"-----\nINTEGRITY CHECK:")
     integrity_report = {
-        "data_types": check_data_types(df),
+        "data_types": check_data_types_n_columns(df,n_col),
         "missing_values": check_missing_values(df),
         "duplicates": check_duplicates(df),
         "ranges": check_ranges(df)
@@ -127,4 +142,4 @@ def integrity_check(df):
 
     return integrity_report
 
-integrity_check(df)
+integrity_check(df,n_col=6)
